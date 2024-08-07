@@ -27,8 +27,8 @@ valores_limpios = [x for x in valores if not np.isnan(x)]
 ```}
 
 ```
-Una vez que se tienen los valores limpios en un vector, se procede a calcular la media, 
-la desviación estándar y el coeficiente de variación. Esto se realiza con el fin de determinar el comportamiento de la señal 
+Una vez que se tienen los valores limpios en un vector, se procede a calcular la media (0.107), 
+la desviación estándar (0.73) y el coeficiente de variación (6.83). Esto se realiza con el fin de determinar el comportamiento de la señal 
 y evaluar cuán dispersos están los valores entre sí. Es importante destacar que este proceso se realiza tanto con las funciones 
 básicas de Python como con funciones más complejas que se encargan de calcular estos valores de forma directa.
 
@@ -89,4 +89,8 @@ plt.title('Histograma de la señal')
 plt.show()
 ```
 Al ejecutar el programase puede obtener el sigueiente grafico:
-![Histograma](images/Histograma.png)
+
+![Histograma realizado con pyton](Histograma.png)
+
+Como se puede observar en el gráfico, este presenta una distribución normal, ligeramente sesgada hacia la derecha. 
+Sin embargo, el pico de mayor frecuencia indica que la mayor parte de los valores se ubica cerca de cero en términos de amplitud.
