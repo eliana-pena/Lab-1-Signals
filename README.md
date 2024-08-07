@@ -130,3 +130,50 @@ spinf= valores_limpios + rpul
 ![Ruido de impulso realizado con pyton](Pulso.png)
 
 Como se puede ver en este caso, la señal infectada presenta picos que sobresalen en puntos aleatorios, demostrando la presencia de interferencias.
+
+El último ruido, el de artefacto, es complicado de simular ya que suele ser causado por interferencias en un sistema al realizar una medición. Por ende, este puede tener diferentes morfologías. Para el ejemplo, se utilizó una señal seno con una longitud y una amplitud preestablecidas. Esta sección del código también hace uso de un vector de ceros y un selector aleatorio que determina el inicio de la señal.
+
+```python
+# Ruido de Tipo Artefacto
+
+rart = np.zeros(nm)
+ampart = 5
+durart = 5000
+artini = np.random.randint(0,nm)
+rart[artini: artini + durart]= ampart * np.sin(np.linspace(0,2*np.pi,durart))
+
+# Infectar la señal con ruido de tipo artefacto
+sainf=valores_limpios + rart
+```
+
+![Ruido de artefacto realizado con pyton](Artefacto.png)
+
+## Relación ruido señal (SNR)
+Una vez que se tienen tanto la señal como el ruido, el programa calcula la potencia de ambos y las relaciona para poder hallar el valor del SNR en decibeles. Esto se hace con todas las señales de ruido.
+
+```python
+# Función para calcular la relación señal-ruido (SNR)
+def snr (valores, ruido):
+    fsum = 0
+    ssum = 0
+    potv= 0
+    potr = 0
+    for x in valores:
+        fsum += (x) ** 2
+    potv = fsum/len(valores)
+    
+    for x in ruido:
+        ssum += (x) ** 2
+    potr = ssum/len(ruido)
+
+    return 10 * np.log10(potv / potr)
+```
+
+## Requisitos
+- Pyton 3.9.0 ó superior
+### Libreias:
+- numpy
+- wfdb
+- matplotlib
+## Contacto 
+sst.julian.vergara@unimilitar.edu.co
