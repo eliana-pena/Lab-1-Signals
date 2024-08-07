@@ -88,9 +88,45 @@ plt.ylabel('Frecuencia')
 plt.title('Histograma de la señal')
 plt.show()
 ```
-Al ejecutar el programase puede obtener el sigueiente grafico:
+Al ejecutar el programase puede obtener el siguiente grafico:
 
 ![Histograma realizado con pyton](Histograma.png)
 
 Como se puede observar en el gráfico, este presenta una distribución normal, ligeramente sesgada hacia la derecha. 
 Sin embargo, el pico de mayor frecuencia indica que la mayor parte de los valores se ubica cerca de cero en términos de amplitud.
+
+# Ruido 
+Para generar el ruido, se creó una funciones aleatorias que generan números basados en la amplitud y la cantidad de muestras de la señal que se desea contaminar. En el caso del ruido gaussiano, hay un valor por cada muestra. En este caso, la longitud del vector de valores.
+
+```python
+# Ruido Gaussiano
+medrg=0
+desvrg=1
+rgauss=np.random.normal(medrg,desvrg,nm)
+
+ampmax = max(abs(min_val),abs(max_val))- 3
+rgaussn = rgauss/np.max(np.abs(rgauss))*ampmax
+
+# Infectar la señal con ruido Gaussiano
+sginf = valores_limpios + rgaussn 
+```
+
+![Ruido Gaussiano realizado con pyton](Gauss.png)
+
+Al introducir ruido gaussiano en la señal, se puede observar un aumento en la amplitud de la señal original, lo que distorsiona y cambia ligeramente la morfología de la señal.
+
+Para generar un ruido de impulso, se crea un vector de ceros y se selecciona un valor aleatorio para reemplazarlo por un valor de amplitud. Además, el código también tiene la capacidad de generar una cantidad específica de pulsos.
+
+```python
+# Ruido de Pulso
+numpul=10
+rpul=np.zeros(nm)
+indpul= np.random.choice(nm,numpul,replace=False)
+rpul[indpul] = np.random.choice([-5,5],numpul)
+
+# Infectar la señal con ruido de pulso unitario
+spinf= valores_limpios + rpul
+```
+![Ruido de impulso realizado con pyton](Pulso.png)
+
+Como se puede ver en este caso, la señal infectada presenta picos que sobresalen en puntos aleatorios, demostrando la presencia de interferencias.
