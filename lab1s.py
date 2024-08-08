@@ -1,219 +1,167 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jul 25 15:32:50 2024
+Created on Sun Jul 28 17:02:21 2024
 
-@author: Estudiante
+@author: 57322
 """
-#importar paquete wfdb para leer "records" de physionet 
+
+#importa las librerias
 import wfdb
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
-# cargar la información (archivos .dat y .hea)
-signal = wfdb.rdrecord('cu05')
 
-# obtener valores de y en la señal 
-valores = signal.p_signal
 
-# Aplanar los valores a una dimensión
-valores = valores.flatten()
+#obtener los valores de Y de la señal
+signal = wfdb.rdrecord('Subject10_AccTempEDA')
+valores = signal.p_signal[:,1]
+longitud =len(valores) #numero de muestras 
 
-# Eliminar valores NaN
-valores_limpios = [x for x in valores if not np.isnan(x)]
+# Graficar la señal
+plt.plot(valores)
+plt.title("Señal Fisiológica")
+plt.xlabel("Tiempo (s)")
+plt.ylabel("EDA (uS)")
+plt.show()
 
-# Función para calcular la media de los valores
-def calc_media(valores):
-    total=0
-    for x in valores:
-        total += x
-    return total / len(valores)
+"ESTADÍSTICOS DESCRIPTIVOS"
 
-# Función para calcular la mediana de los valores
-# def calc_mediana(valores):
-#    val_ord = sorted(valores)
-#    n = len(val_ord)
-#    mid = n // 2
-#    if n % 2 == 0:
-#        return (val_ord[mid - 1] + val_ord[mid]) / 2
-#    else:
-#        return val_ord[mid]
+#Estadísticos descriptivos:Media manual
+val_total= 0
+for i in valores:
+    val_total+=i
 
-# Función para calcular la desviación estándar de los valores
-def calc_desv(valores, media):
-    suma_difcuad = 0
-    for x in valores:
-        suma_difcuad += (x - media) ** 2 #Sumando en un bucle
-    return (suma_difcuad / len(valores)) ** 0.5
+media_manual = (val_total/longitud)
 
-# Función para calcular el coeficiente de variación
-def calc_coe(media,desviacion):
-    return desviacion/media
+#Cálculo desviación estándar a partir de operaciones 
+  
+diferencia_cuadrados = ((i-media_manual)**2 for i in valores)
+suma_diferencia= 0 
+for j in diferencia_cuadrados:
+    suma_diferencia+=j
 
-# Función para calcular la relación señal-ruido (SNR)
-def snr (valores, ruido):
-    fsum = 0
-    ssum = 0
-    potv= 0
-    potr = 0
-    for x in valores:
-        fsum += (x) ** 2
-    potv = fsum/len(valores)
     
-    for x in ruido:
-        ssum += (x) ** 2
-    potr = ssum/len(ruido)
+desviacion_estandar_manual = (float(suma_diferencia/(longitud -1 )))**0.5
+coeficiente_variacion_manual = (desviacion_estandar_manual / media_manual)
 
-    return 10 * np.log10(potv / potr)
+print(f"Media calculada manualmente: {media_manual}")
+print(f"Desviación estándar calculada manualmente: {desviacion_estandar_manual}")
+print(f"Coeficiente de variación calculado manualmente: {coeficiente_variacion_manual:.2f}%")
 
-# Media, mediana, desviación estándar - calculadas por funciones de numpy
-media = np.nanmean(valores)
-#mediana = np.nanmedian(valores)
-desviacion = np.nanstd(valores)
+#Estadísticos descriptivos: Media y Desviación Estándar usando funciones predefinidas
 
-# Media, mediana, desviación estándar - cálculos con fórmulas
-mediac = calc_media(valores_limpios)
-#medianac = calc_mediana(valores_limpios)
-desvc = calc_desv(valores_limpios, mediac)
-coef = calc_coe(media, desviacion)
+media_predefinida = np.mean(valores)
+desviacion_estandar_predefinida = np.std(valores, ddof=1)
+coeficiente_variacion_predefinida = (desviacion_estandar_predefinida / media_predefinida) 
 
-print(f"Media: {media}, Media*: {mediac}")
-#print(f"Mediana: {mediana}, Mediana*: {medianac}")
-print(f"Desviación: {desviacion}, Desviación*: {desvc}")
-print(f"Coeficiente de desviacion: {coef}")
+print(f"Media usando funciones predefinidas: {media_predefinida}")
+print(f"Desviación estándar usando funciones predefinidas: {desviacion_estandar_predefinida}")
+print(f"Coeficiente de variación usando funciones predefinidas: {coeficiente_variacion_predefinida:.2f}%")
 
-#plt.plot(valores)
-#plt.title('Señal')
-#plt.xlabel('Muestras')
-#plt.ylabel('Valor de la señal')
-#plt.show()
-
-# Calcular histograma manualmente
-min_val=min(valores_limpios)
-max_val=max(valores_limpios)
-
-nbin = 20
-wbin= (max_val-min_val)/nbin
-
-bins = [0] * nbin
-
-# Asignar valores a bins 
-for val in valores_limpios:
-    binx = int((val - min_val) / wbin)
-    if binx == nbin:
-        binx -= 1
-    bins[binx] +=1
-
-# Crear bordes de bins para el histograma
-ebin=[min_val + i * wbin for i in range (nbin +1)]
-
-# Graficar histograma
-plt.bar(ebin[:-1], bins, width=wbin, edgecolor='black') # funcion para graficar diagrama de barras
-plt.xlabel('Valor de la señal')
-plt.ylabel('Frecuencia')
-plt.title('Histograma de la señal')
+#Graficar el histograma de la señal mediante funciones de python
+plt.hist(valores, bins=8,edgecolor='black')
+plt.title("Histograma de la señal con funciones")
+plt.xlabel("Valor (uS)")
+plt.ylabel("# muestra")
 plt.show()
 
-#plt.hist(valores,bins=20)
-#plt.title('Histograma de la señal')
-#plt.xlabel('Muestras')
-#plt.ylabel('frecuencia')
-#plt.show()
+#Histograma de la señal manual
 
-nm=len(valores_limpios)
+num_bins = 8 
+min_val = valores[0]
+max_val = valores[0]
+for valor in valores:
+    if valor < min_val:
+        min_val = valor
+    if valor > max_val:
+        max_val = valor
 
-##################################################################
-# Ruido Gaussiano
-medrg=0
-desvrg=1
-rgauss=np.random.normal(medrg,desvrg,nm)
+bin_ancho = (max_val - min_val) / num_bins
+bins = [0] * num_bins
 
-ampmax = max(abs(min_val),abs(max_val))- 3
-rgaussn = rgauss/np.max(np.abs(rgauss))*ampmax
+for valor in valores:
+    bin_cajita = int((valor - min_val) / bin_ancho)
+    if bin_cajita == num_bins:  
+        bin_cajita-= 1
+    bins[bin_cajita] += 1
 
-# Infectar la señal con ruido Gaussiano
-sginf = valores_limpios + rgaussn 
-
-plt.figure(figsize=(15,5))
-
-plt.subplot(3,1,1)
-plt.plot(valores_limpios)
-plt.title('Señal origianl')
-
-plt.subplot(3,1,2)
-plt.plot(rgaussn,color = 'red')
-plt.title('Ruido Gaussiano Normalizado')
-
-plt.subplot(3,1,3)
-plt.plot(sginf,color = 'purple')
-plt.title('Señal Infectada con Ruido Gaussiano')
-
-plt.tight_layout()
-plt.show()
-##################################################################
-# Ruido de Pulso
-numpul=10
-rpul=np.zeros(nm)
-indpul= np.random.choice(nm,numpul,replace=False)
-rpul[indpul] = np.random.choice([-5,5],numpul)
-
-# Infectar la señal con ruido de pulso unitario
-spinf= valores_limpios + rpul
-
-plt.figure(figsize=(15, 5))
-
-plt.subplot(3, 1, 1)
-plt.plot(valores_limpios, color='blue')
-plt.title('Señal Original')
-
-plt.subplot(3, 1, 2)
-plt.plot(rpul, color='yellow')
-plt.title('Ruido de Pulso Unitario')
-
-plt.subplot(3, 1, 3)
-plt.plot(spinf, color='green')
-plt.title('Señal Infectada con Ruido de Pulso Unitario')
-
-plt.tight_layout()
+# Graficar el histograma manual
+bin_borde = [min_val + i * bin_ancho for i in range(num_bins + 1)]
+plt.bar(bin_borde[:-1], bins, width=bin_ancho, edgecolor='black')
+plt.title("Histograma de la señal (manual)")
+plt.xlabel("Valor (uS)")
+plt.ylabel("# muestra")
 plt.show()
 
-###################################################################
-# Ruido de Tipo Artefacto
+# Generar ruido gaussiano
+ruido_gaussiano = np.random.normal(0, np.std(valores), len(valores))
+signal_ruido_gaussiano = valores + ruido_gaussiano
 
-rart = np.zeros(nm)
-ampart = 5
-durart = 5000
-artini = np.random.randint(0,nm)
-rart[artini: artini + durart]= ampart * np.sin(np.linspace(0,2*np.pi,durart))
 
-# Infectar la señal con ruido de tipo artefacto
-sainf=valores_limpios + rart
+potencia_senal = np.mean(valores ** 2)
+potencia_ruido_gaussiano = np.mean(ruido_gaussiano ** 2)
+print(potencia_ruido_gaussiano,potencia_senal)
 
-plt.figure(figsize=(15, 5))
+snr_gaussiano = 10 * np.log10(potencia_senal / potencia_ruido_gaussiano)
+print(f"SNR con ruido gaussiano: {snr_gaussiano:.2f} dB")
 
-plt.subplot(3, 1, 1)
-plt.plot(valores_limpios, color='blue')
-plt.title('Señal Original')
-
-plt.subplot(3, 1, 2)
-plt.plot(rart, color='red')
-plt.title('Ruido de Tipo Artefacto')
-
-plt.subplot(3, 1, 3)
-plt.plot(sainf, color='green')
-plt.title('Señal Infectada con Ruido de Tipo Artefacto')
-
-plt.tight_layout()
+# Graficar la señal contaminada
+plt.plot(signal_ruido_gaussiano)
+plt.title("Señal con Ruido Gaussiano")
+plt.xlabel("Tiempo (s)")
+plt.ylabel("EDA (uS)")
 plt.show()
 
-##################################################################
 
-# Calcular y mostrar la SNR para cada tipo de ruido
-snr_valg = snr(valores_limpios,rgaussn)
-snr_valp = snr(valores_limpios,rpul)
-snr_vala = snr(valores_limpios,rart)
-print(f"Relacion señal ruido Gauss: {snr_valg} dB")
-print(f"Relacion señal ruido Impulso: {snr_valp} dB")
-print(f"Relacion señal ruido Artefacto: {snr_vala} dB")
+# Generar ruido de impulso
+ruido_impulso = np.zeros(len(valores))
+num_impulsos = int(0.01 * len(valores))  
+impulso_amplitud = np.max(np.abs(valores)) * 2  # amplitud de los impulsos
+
+for _ in range(num_impulsos):
+    posicion = random.randint(0, len(valores) - 1)
+    ruido_impulso[posicion] = impulso_amplitud * (1 if random.random() < 0.5 else -1)
+
+
+signal_ruido_impulso = valores + ruido_impulso
+
+potencia_ruido_impulso = np.mean(ruido_impulso ** 2)
+
+# Calcular el SNR
+snr_impulso = 10 * np.log10(potencia_senal / potencia_ruido_impulso)
+print(f"SNR con ruido de impulso: {snr_impulso:.2f} dB")
+
+plt.plot(signal_ruido_impulso)
+plt.title("Señal con Ruido de Impulso")
+plt.xlabel("Tiempo (s)")
+plt.ylabel("EDA (uS)")
+plt.show()
+
+# Generar ruido tipo artefacto
+ruido_artefacto = np.zeros(len(valores))
+num_artefactos = int(0.01 * len(valores))  
+artefacto_amplitud = np.max(np.abs(valores)) * 2  
+artefacto_duracion = 10 
+
+for _ in range(num_artefactos):
+    posicion_inicio = random.randint(0, len(valores) - artefacto_duracion)
+    ruido_artefacto[posicion_inicio:posicion_inicio + artefacto_duracion] = artefacto_amplitud
+
+
+signal_ruido_artefacto = valores + ruido_artefacto
+potencia_ruido_artefacto = np.mean(ruido_artefacto ** 2)
+
+# Calcular el SNR
+snr_artefacto = 10 * np.log10(potencia_senal / potencia_ruido_artefacto)
+print(f"SNR con ruido tipo artefacto: {snr_artefacto:.2f} dB")
+
+# Graficar la señal contaminada
+plt.plot(signal_ruido_artefacto)
+plt.title("Señal con Ruido Tipo Artefacto")
+plt.xlabel("Tiempo (s)")
+plt.ylabel("EDA (uS)")
+plt.show()
 
 
 
