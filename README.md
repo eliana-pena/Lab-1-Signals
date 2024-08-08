@@ -1,5 +1,5 @@
 # Analisis estadistico de una señal
-## Introduccion 
+## Introducción 
 El laboratorio consistió en el desarrollo de un código en Python para el análisis de 
 una señal fisiológica extraída de PhysioNet. El código funciona en señales individuales.
 ## Tratamiento de la señal y operaciones estadisticas
